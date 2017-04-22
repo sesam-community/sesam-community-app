@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sesam Community</title>
+
+  <!-- React JS -->
+  <script src="https://unpkg.com/react@latest/dist/react.js"></script>
+  <script src="https://unpkg.com/react-dom@latest/dist/react-dom.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+
+  <!-- Materialize -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Firebase -->
+  <script defer src="/__/firebase/3.8.0/firebase-app.js"></script>
+  <!-- include only the Firebase features as you need -->
+  <script defer src="/__/firebase/3.8.0/firebase-auth.js"></script>
+  <script defer src="/__/firebase/3.8.0/firebase-database.js"></script>
+  <script defer src="/__/firebase/3.8.0/firebase-messaging.js"></script>
+  <script defer src="/__/firebase/3.8.0/firebase-storage.js"></script>
+  <!-- initialize the SDK after all desired features are loaded -->
+  <script defer src="/__/firebase/init.js"></script>
+
+</head>
+<body>
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h1 class="header center orange-text">Sesam Community</h1>
+      <div class="row center">
+        <h5 class="header col s12 light">Sesam extentions maintained by the community</h5>
+      </div>
+      <div class="row center">
+        <a href="https://docs.sesam.io/extension-points.html" class="btn-large waves-effect waves-light orange">Extending Sesam</a>
+        <a href="https://github.com/sesam-community/guidelines" class="btn-large waves-effect waves-light orange">Community Guidelines</a>
+      </div>
+    </div>
+  </div>
+  <div id="app">
+  </div>
+
+  <script type="text/babel">
+    const rules = {
+      'same-image-name-as-repo-name': {
+        title: 'Correct image name',
+        description: 'Docker image name should match the name of the Github repo',
+        tag: 'dockerfile',
+        error: true
+      },
+      'has-description-github': {
+        title: 'Description',
+        description: 'Repository should have a description',
+        tag: 'github'
+      },
+      'has-topic-sesam-in-github': {
+        title: 'Sesam topic',
+        description: 'Every repository should be tagged with topic \'Sesam\'',
+        tag: 'github'
+      },
+      'has-topic-sink-source-transform-or-misc-in-github': {
+        title: 'Additional topic',
+        description: 'Every repository should be tagget with one or more of source, sink, transform or misc',
+        tag: 'github'
+      },
+      'is-in-travis': {
+        title: 'Present',
+        description: 'Repository must be activated in Travis',
+        tag: 'travis',
+        error: true
+      },
+      'has-docker-password-in-travis': {
+        title: 'Docker password',
+        description: 'Environment variable DOCKER_PASSWORD must be configured on the repository in Travis',
+        tag: 'travis',
+        error: true
+      },
+      'has-docker-username-in-travis': {
+        title: 'Docker username',
+        description: 'Environment variable DOCKER_USERNAME must be configured on the repository in Travis',
+        tag: 'travis',
+        error: true
+      },
+      'is-in-dockerhub': {
+        title: 'Built',
+        description: 'Build must be working in order for Travis to push to Dockerhub',
+        tag: 'travis',
+        error: true
+      },
+      'matching-description-in-dockerhub': {
+        title: 'Description match',
+        description: 'Description in Dockerhub should be the same as on Github',
+        tag: 'dockerhub'
+      },
+      'matching-full-description-in-dockerhub': {
+        title: 'Full description match',
+        description: 'Full description in Dockerhub should be a link to the Github repository',
+        tag: 'dockerhub'
+      },
+      'has-reference-to-image-name-in-readme': {
+        title: 'Image name reference',
+        description: 'Image name should be referenced in the example config section of the readme',
+        tag: 'readme'
+      },
+      'has-travis-badge-in-readme': {
+        title: 'Travis Badge',
+        description: 'Readme should include a Travis badge to show that build is working',
+        tag: 'readme'
+      },
+    };
+
+    function Validator(props) {
+      const tag = props.tag;
+      const repo = props.repo;
+
+      const add = (a, b) => a + b;
+
+      const countViolations = (keyFilter) => Object.keys(repo)
+        .filter(k => k in rules)
+        .filter(k => rules[k].tag === tag)
+        .filter(keyFilter)
+        .map(k => repo[k] ? 0 : 1)
+        .reduce(add, 0);
+      const errors = countViolations(k => rules[k].error);
+      const warnings = countViolations(k => !rules[k].error);
+      const problems = Object.keys(repo)
+        .filter(k => k in rules)
+        .filter(k => rules[k].tag === tag)
+        .filter(k => !repo[k])
+        .map(k => rules[k].description);
+      return (
+        <i className="material-icons small" title={problems.join(". ")}>{ errors > 0 ? 'error' : warnings > 0 ? 'warning' : 'done'}</i>
+      );
+    }
+
+    function RepoCard(props) {
+      function add(a, b) {
+        return a + b;
+      }
+      return (
+        <div className="card">
+          <div className="card-content">
+            <span className="card-title">{props.data.name}</span>
+            <p>{props.data.description}</p>
+          </div>
+          <div className="card-action">
+            {props.data.html_url && <a href={props.data.html_url}><Validator tag="github" repo={props.data}/> Github</a>}
+            {props.data.travis_url && <a href={props.data.travis_url}><Validator tag="travis" repo={props.data}/> Travis</a>}
+            {props.data.dockerhub_url && <a href={props.data.dockerhub_url}><Validator tag="dockerhub" repo={props.data}/> Dockerhub</a>}
+            {props.data.readme_url && <a href={props.data.readme_url}><Validator tag="readme" repo={props.data}/> Readme</a>}
+          </div>
+        </div>
+      );
+    }
+
+    class App extends React.Component {
+      constructor(props) {
+        super(props);
+        this.repos = {};
+        this.state = { repos: this.repos };
+      }
+
+      componentWillMount() {
+        this.firebaseRef = firebase.database().ref('repos');
+        this.firebaseRef.on("child_added", function (data) {
+          this.repos[data.key] = data.val();
+          this.setState({
+            repos: this.repos
+          });
+        }.bind(this));
+        this.firebaseRef.on("child_removed", function (data) {
+          delete this.repos[data.key];
+          this.setState({
+            repos: this.repos
+          });
+        }.bind(this));
+        this.firebaseRef.on("child_changed", function (data) {
+          this.repos[data.key] = data.val();
+          this.setState({
+            repos: this.repos
+          });
+        }.bind(this));
+      }
+
+      componentWillUnmount() {
+        this.firebaseRef.off();
+      }
+
+      render() {
+        return (
+          <div className="container">
+            <div className="section">
+              {Object.keys(this.state.repos).map(k => (
+                <RepoCard key={k} data={this.state.repos[k]} />
+              ))}
+            </div>
+          </div>
+        );
+      }
+    }
+
+    ReactDOM.render( <App />, document.getElementById('app'));
+  </script>
+</body>
+</html>
