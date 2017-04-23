@@ -64,6 +64,11 @@
         tag: 'dockerfile',
         error: true
       },
+      'has-issue-tracker': {
+        title: 'Issue tracker',
+        description: 'Repository should have an issue tracker',
+        tag: 'github'
+      },
       'has-description-github': {
         title: 'Description',
         description: 'Repository should have a description',
@@ -164,6 +169,7 @@
             {props.data.travis_url && <a href={props.data.travis_url}><Validator tag="travis" repo={props.data}/> Travis</a>}
             {props.data.dockerhub_url && <a href={props.data.dockerhub_url}><Validator tag="dockerhub" repo={props.data}/> Dockerhub</a>}
             {props.data.readme_url && <a href={props.data.readme_url}><Validator tag="readme" repo={props.data}/> Readme</a>}
+            {props.data.issues_url && <a href={props.data.issues_url}><Validator tag="issues" repo={props.data}/> Issues</a>}
           </div>
         </div>
       );
