@@ -17,6 +17,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+  <!-- momentjs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
   <!-- Firebase -->
   <script defer src="/__/firebase/3.8.0/firebase-app.js"></script>
   <!-- include only the Firebase features as you need -->
@@ -181,6 +183,14 @@
               </pre>
               <p>You might need to change the port and environment settings. {props.data.readme_url && 'Consult the README file for more information.'}</p>
             </details>
+            {props.data.tags && <details>
+              <summary>Available tags</summary>
+              <ul>
+                {props.data.tags.map(t => (
+                  <li key={t.name}><b>{t.name}</b>: ({Math.round(t.size / 1e6)} Mb) - built { moment(t.last_updated).fromNow()} </li>
+                ))}
+              </ul>
+            </details>}
           </div>
           <div className="card-action">
             {props.data.html_url && <a href={props.data.html_url}><Validator tag="github" repo={props.data}/> Github</a>}
