@@ -204,25 +204,32 @@
   }
 
   function searchRepos() {
-    console.log(this.repos)
+    var repos = [{
+      'description': 'something',
+      'name': 'this is a test'
+    },
+    {
+      'description': 'something else',
+      'name': 'this is foo'
+    }]
     // Declare variables
-    var input, filter, a, i;
+    var input, filter, a, i, txtValue;
     const li = []
     input = document.getElementById('myInput');
     filter = input.value.toUpperCase();
-    for (i = 0; i < this.repos.length; i++) {
-      li.push(this.repos[i].name)
+    for (i = 0; i < repos.length; i++) {
+      li.push(repos[i].name)
     }
 
       // Loop through all list items, and hide those who don't match the search query
       for (i = 0; i < li.length; i++) {
         a = li[i];
-        console.log(a)
-        console.log(filter)
         if (a.toUpperCase().indexOf(filter) > -1) {
-          li[i] = "";
+          console.log('first')
+          console.log(a)
         } else {
-          li[i] = "none";
+          console.log('second')
+          return a
         }
       }
     }
@@ -301,7 +308,6 @@
       'description': 'something else',
       'name': 'this is foo'
     }]
-    console.log(this.repos)
     // Declare variables
     var input, filter, a, i;
     const li = []
@@ -314,24 +320,24 @@
       // Loop through all list items, and hide those who don't match the search query
       for (i = 0; i < li.length; i++) {
         a = li[i];
-        console.log(a)
-        console.log(filter)
         if (a.toUpperCase().indexOf(filter) > -1) {
+          console.log('first')
           li[i] = "";
         } else {
+          console.log('second')
           li[i] = "none";
         }
       }
     }
 
-    render() {
-      return (
-        <input type="text" id="myInput" onkeyup={ this.searchRepos() } placeholder="Search for repositories.."></input>
-      );
-    }
+    //render() {
+      //return (
+        //<input type="text" id="myInput" onkeyup={ this.searchRepos() } placeholder="Search for repositories.."></input>
+      //);
+    //}
   }
   
-  ReactDOM.render( <Search />, document.getElementById('myInput'));
+  //ReactDOM.render( <Search />, document.getElementById('myInput'));
 
 
   class App extends React.Component {
