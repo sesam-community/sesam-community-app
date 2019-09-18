@@ -33,13 +33,13 @@
   <div class="section no-pad-bot" id="index-banner">
     <div class="container">
       <br><br>
-      <h1 class="header center blue-text">Sesam Community</h1>
+      <h1>Sesam Community</h1>
       <div class="row center">
         <h5 class="header col s12 light">Sesam extentions maintained by the community</h5>
       </div>
       <div class="row center">
-        <a href="https://docs.sesam.io/extension-points.html" class="btn-large waves-effect waves-light blue">Extending Sesam</a>
-        <a href="https://github.com/sesam-community/guidelines" class="btn-large waves-effect waves-light blue">Community Guidelines</a>
+        <a href="https://docs.sesam.io/extension-points.html" class="btn-large btn-links">Extending Sesam</a>
+        <a href="https://github.com/sesam-community/guidelines" class="btn-large btn-links">Community Guidelines</a>
       </div>
     </div>
   </div>
@@ -49,7 +49,7 @@
       </div>
     </div>
   </div>
-  <footer class="page-footer blue">
+  <footer class="page-footer">
     <div class="footer-copyright">
       <div class="container">
         Powered by <a class="blue-text text-lighten-3" href="https://firebase.google.com">Firebase</a> and <a class="blue-text text-lighten-3" href="https://sesam.io">Sesam</a>
@@ -136,9 +136,14 @@
   function Validator(props) {
     const tag = props.tag;
     const repo = props.repo;
-    //console.log(props)
-    if (repo.updated_at != null) {
-      repo.updated_at = repo.updated_at.substring(0, 10)
+    repo.lastUpdate = ""
+    try {
+      if (repo.tags[0].last_updated != null) {
+        repo.tags[0].last_updated = repo.tags[0].last_updated.substring(0, 10)
+      }
+      repo.lastUpdate = repo.tags[0].last_updated
+    } catch (error) {
+      repo.lastUpdate = "Not valid"
     }
     if (repo.pull_count == null) {
       repo.pull_count = 0        
@@ -148,9 +153,6 @@
     }
     if (repo.forks == null) {
       repo.forks = 0
-    }
-    if (repo.updated_at == null) {
-      repo.updated_at = "Not valid";
     }
 
     const add = (a, b) => a + b;
@@ -190,17 +192,18 @@
     };
 
     const NoUpdate = "No date provided"
+    //props.data.tags[0].last_updated
 
     return (
-      <div className="card blue-grey darken-1">
+      <div className="card">
         <div className="card-content white-text">
           <span className="card-title">{props.data.name}</span>
           {props.data.badge_url && <img src={props.data.badge_url} alt="travis-badge" />}
           <p>{props.data.description}</p>
-          <p>Last update : {props.data.updated_at}</p>
+          <p>Last update : {props.data.lastUpdate}</p>
           <p>Forks : {props.data.forks}</p>
           <p>Pulls : {props.data.pull_count}</p>
-          <p>Config count : {props.data.total_count}</p>
+          <p>System count : {props.data.total_count}</p>
           <details>
             <summary>Example config</summary>
             <pre>
@@ -228,26 +231,27 @@
     );
   }
 
-
-  class Filter extends React.Component {
+  class SortBy extends React.Component {
     constructor(props) {
       super(props);
-      this.filterChanged = ev => {
-        this.props.onFilterChanged(ev.target.value)
+      this.sortByChanged = ev => {
+        //console.log("f", ev)
+        this.props.onSortByChanged(ev.target.value)
       }
     }
 
     render() {
       return (
-        <div class="dropdown">
-          <button  id="dropbtn" onclick={this.filterChanged} class="btn-large waves-effect waves-light blue">FILTER</button>
-          <div id="myDropdown" class="dropdown-content">
-            <a href="#update">Last Update</a>
-            <a href="#forks">Forks</a>
-            <a href="#pulls">Pulls</a>
-            <a href="#config">Config Count</a>
-          </div>
-        </div>
+        <label>
+          Sort By... 
+          <br></br>    
+        <select class="btn-large btn-filter" onChange={this.sortByChanged} value={this.props.sortBy}>
+            <option value="lastUpdate">Last Update</option>
+            <option value="forks">Forks</option>
+            <option value="pull_count">Pulls</option>
+            <option value="total_count">System count</option>
+        </select>
+        </label>
       );
     }
   }
@@ -257,7 +261,7 @@
     constructor(props) {
       super(props);
       this.handleChanged = ev => {
-        this.props.onSearchChanged(ev.target.value) 
+        this.props.onSearchChanged(ev.target.value)
       }
     }
 
@@ -274,12 +278,16 @@
       super(props);
       this.repos = {};
       this.handleSearchChanged = (value) => {
-        this.setState({value: value});
+        this.setState({search: value});
       }
-      this.handleFilterChanged = (value) => {
-        this.setState({value: value});
+      this.handleSortByChanged = (value) => {
+        this.setState({sortBy: value});
       }
-      this.state = { repos: this.repos, value: "" };
+      this.state = { 
+        repos: this.repos, 
+        sortBy: "",
+        search: "" 
+      };
     }
 
     componentWillMount() {
@@ -302,7 +310,7 @@
           repos: this.repos
         });
       }.bind(this));
-      console.log(this.repos)
+      //console.log(this.state.repos)
     }
 
     componentWillUnmount() {
@@ -310,18 +318,48 @@
     }
 
     render() {
-      const searchedRepoNames = Object.keys(this.state.repos).filter(name => {
-        return name.startsWith(this.state.value);
+      const repoList = Object.values(this.state.repos)
+      const filteredRepoList = repoList.filter(repo => {
+        if (repo.name) {
+          return repo.name.startsWith(this.state.search);
+        } else {
+          return false
+        }
       })
-      const filteredRepos = Object.keys(this.state.repos).filter(pull_count => {
-        return (pull_count).startsWith(this.state.value)
+
+      const sortedRepoList = filteredRepoList.sort((a, b) => {
+        var aValue = ""
+        var bValue = ""
+        var cValue = ""
+        if (this.state.sortBy === "lastUpdate") {
+          // Add additional func for sorting Not valid on bottom.
+          if (a[this.state.sortBy] === "Not valid") {
+            return 1;
+          }
+          else if (b[this.state.sortBy] === "Not valid") {
+            return -1;
+          }
+          else {
+            aValue = new Date(a[this.state.sortBy])
+            bValue = new Date(b[this.state.sortBy])
+          }
+          return bValue - aValue
+        }
+        else {
+          aValue = a[this.state.sortBy]
+          bValue = b[this.state.sortBy]
+          //console.log("Sorting other stuff")
+          return bValue - aValue
+        }
       })
+      //console.log("asdfa", this.state.sortBy)
+
       return (
         <div>
-          <Filter onFilterChanged={this.handleFilterChanged}/>
+          <SortBy onSortByChanged={this.handleSortByChanged} sortBy={this.state.sortBy}/>
           <Search onSearchChanged={this.handleSearchChanged} />
-          {searchedRepoNames.map(name => (
-            <RepoCard key={name} data={this.state.repos[name]} />
+          {sortedRepoList.map(repo => (
+            <RepoCard key={repo.name} data={repo} />
           ))}
         </div>
       );
@@ -335,60 +373,66 @@
 <style scoped>
 
 #myInput {
-  background-image: url('https://img.icons8.com/wired/64/000000/search.png'); /* Add a search icon to input */
-  background-position: 8px 10px; /* Position the search icon */
-  background-repeat: no-repeat; /* Do not repeat the icon image */
-  width: 25%; /* Full-width */
+  width: 20%; /* Full-width */
   font-size: 16px; /* Increase font-size */
-  padding: 12px 20px 12px 40px; /* Add some padding */
-  margin-top: 12px;
+  margin-top: 10px;
   margin-bottom: 1px; /* Add some space below the input */
+  margin-left: 20px;
+  text-align: center;
+  border-bottom-color: #009FDF;
+}
+
+.btn-filter {
+  width: 15%; /* Full-width */
+  background-color: #009FDF;
+  box-shadow: none;
+  transition: none;
+  margin-bottom: 1px;
+}
+
+.btn-links {
+  width: 30%; /* Full-width */
+  height: 10%;
+  background-color: #009FDF;
+  border: 2px solid #009fdf;
+  box-shadow: none;
+}
+
+.btn-links:hover
+{
+background-image:none;
+background-color:white;
+color: #009fdf;
+box-shadow: none;
+}
+
+.btn-filter:hover
+{
+background-image:none;
+background-color:#009FDF;
+}
+
+.card-action {
+  color: #009fdf;
+}
+
+h1 {
+  color: #009FDF;
   text-align: center;
 }
 
-/* Dropdown Button */
-.dropbtn {
-  background-color: #3498DB;
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
+label {
+  font-size: 1rem;
 }
 
-/* Dropdown button on hover & focus */
-.dropbtn:hover, .dropbtn:focus {
-  background-color: #2980B9;
+.page-footer {
+  color: #3D3935;
+  background-color: #3D3935;
 }
 
-/* The container <div> - needed to position the dropdown content */
-.dropdown {
-  position: relative;
-  display: inline-block;
+.card {
+  color: #3D3935;
+  background-color: #3D3935;
 }
-
-/* Dropdown Content (Hidden by Default) */
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-/* Links inside the dropdown */
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-/* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #ddd}
-
-/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
-.show {display:block;}
 
 </style>
