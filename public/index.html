@@ -242,9 +242,9 @@
           Sort By... 
           <br></br>    
         <select class="btn-large btn-filter" onChange={this.sortByChanged} value={this.props.sortBy}>
-            <option value="lastUpdate">Last Update</option>
-            <option value="pull_count">Dockerhub Pulls</option>
             <option value="total_count">Projects using this MS</option>
+            <option value="pull_count">Dockerhub Pulls</option>
+            <option value="lastUpdate">Last Update</option>
         </select>
         </label>
       );
@@ -378,7 +378,7 @@
 }
 
 .btn-filter {
-  width: 15%; /* Full-width */
+  width: 25%; /* Full-width */
   background-color: #009FDF;
   box-shadow: none;
   transition: none;
