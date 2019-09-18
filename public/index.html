@@ -151,9 +151,6 @@
     if (repo.total_count == null) {
       repo.total_count = 0
     }
-    if (repo.forks == null) {
-      repo.forks = 0
-    }
 
     const add = (a, b) => a + b;
 
@@ -201,9 +198,8 @@
           {props.data.badge_url && <img src={props.data.badge_url} alt="travis-badge" />}
           <p>{props.data.description}</p>
           <p>Last update : {props.data.lastUpdate}</p>
-          <p>Forks : {props.data.forks}</p>
-          <p>Pulls : {props.data.pull_count}</p>
-          <p>System count : {props.data.total_count}</p>
+          <p>Dockerhub Pulls : {props.data.pull_count}</p>
+          <p>Projects using this MS : {props.data.total_count}</p>
           <details>
             <summary>Example config</summary>
             <pre>
@@ -247,9 +243,8 @@
           <br></br>    
         <select class="btn-large btn-filter" onChange={this.sortByChanged} value={this.props.sortBy}>
             <option value="lastUpdate">Last Update</option>
-            <option value="forks">Forks</option>
-            <option value="pull_count">Pulls</option>
-            <option value="total_count">System count</option>
+            <option value="pull_count">Dockerhub Pulls</option>
+            <option value="total_count">Projects using this MS</option>
         </select>
         </label>
       );
