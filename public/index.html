@@ -199,7 +199,7 @@
           <p>{props.data.description}</p>
           <p>Last update : {props.data.lastUpdate}</p>
           <p>Dockerhub Pulls : {props.data.pull_count}</p>
-          <p>Projects using this MS : {props.data.total_count}</p>
+          <p>Projects using this extension : {props.data.total_count}</p>
           <details>
             <summary>Example config</summary>
             <pre>
@@ -242,7 +242,7 @@
           Sort By... 
           <br></br>    
         <select class="btn-large btn-filter" onChange={this.sortByChanged} value={this.props.sortBy}>
-            <option value="total_count">Projects using this MS</option>
+            <option value="total_count">Projects using this extension</option>
             <option value="pull_count">Dockerhub Pulls</option>
             <option value="lastUpdate">Last Update</option>
         </select>
@@ -378,7 +378,7 @@
 }
 
 .btn-filter {
-  width: 25%; /* Full-width */
+  width: 28%; /* Full-width */
   background-color: #009FDF;
   box-shadow: none;
   transition: none;
@@ -426,8 +426,8 @@ label {
 }
 
 .card {
-  color: #3D3935;
-  background-color: #3D3935;
+  color: rgb(113, 121, 121);
+  background-color: rgb(113, 121, 121);
 }
 
 </style>
