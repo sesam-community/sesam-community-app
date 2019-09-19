@@ -247,6 +247,7 @@
           Sort By... 
           <br></br>    
         <select class="btn-large btn-filter" onChange={this.sortByChanged} value={this.props.sortBy}>
+            <option value="">Alphabetically</option>
             <option value="total_count">Projects using this extension</option>
             <option value="pull_count">Dockerhub Pulls</option>
             <option value="lastUpdate">Last Update</option>
