@@ -177,9 +177,11 @@
       return a + b;
     }
 
+    const NoUpdate = "No date provided"
+
     const example = {
-      '_id': `my-${props.data.name}`,
-      type: 'system:microservice',
+    '_id': `${props.data.name}-ms`,
+    type: 'system:microservice',
       docker: {
         environment: {
         },
@@ -188,50 +190,53 @@
       }
     };
 
-    const NoUpdate = "No date provided"
-    //props.data.tags[0].last_updated
-
     return (
-      <div className="card">
-        <div className="card-content white-text">
-          <span className="card-title">{props.data.name}</span>
-          {props.data.badge_url && <img src={props.data.badge_url} alt="travis-badge" />}
-          <p>{props.data.description}</p>
-          <p>Last update : {props.data.lastUpdate}</p>
-          <p>Dockerhub Pulls : {props.data.pull_count}</p>
-          <p>Projects using this extension : {props.data.total_count}</p>
-          <details>
-            <summary>Example config</summary>
-            <pre>
-              {JSON.stringify(example, null, 2)}
-            </pre>
-            <p>You might need to change the port and environment settings. {props.data.readme_url && 'Consult the README file for more information.'}</p>
-          </details>
-          {props.data.tags && <details>
-            <summary>Available tags</summary>
-            <ul id="myUL">
-              {props.data.tags.map(t => (
-                <li key={t.name}><b>{t.name}</b>: ({Math.round(t.size / 1e6)} Mb) - built { moment(t.last_updated).fromNow()}</li>
-              ))}
-            </ul>
-          </details>}
+        <div className="card">
+          <div className="card-content white-text">
+            <span className="card-title">{props.data.name}</span>
+            {props.data.badge_url && <img src={props.data.badge_url} alt="travis-badge" />}
+            <p>{props.data.description}</p>
+            <p>Last update : {props.data.lastUpdate}</p>
+            <p>Dockerhub Pulls : {props.data.pull_count}</p>
+            <p>Projects using this extension : {props.data.total_count}</p>
+            <details>
+              <summary>Example config</summary>
+              <pre>
+                {JSON.stringify(example, null, 2)}
+              </pre>
+              <p>You might need to change the port and environment settings. {props.data.readme_url && 'Consult the README file for more information.'}</p>
+            </details>
+            {props.data.tags && <details>
+              <summary>Available tags</summary>
+              <ul id="myUL">
+                {props.data.tags.map(t => (
+                  <li key={t.name}><b>{t.name}</b>: ({Math.round(t.size / 1e6)} Mb) - built { moment(t.last_updated).fromNow()}</li>
+                ))}
+              </ul>
+            </details>}
+              {/*Making the return ready for manifest.json, in the below logic*/} 
+              {props.data.manifest && <details>
+                <summary>Manifest.json</summary>
+                <pre>
+                  {JSON.stringify(props.data.manifest, null, 2)}
+                </pre>
+            </details>}
+          </div>
+          <div className="card-action">
+            {props.data.html_url && <a href={props.data.html_url}><Validator tag="github" repo={props.data}/> Github</a>}
+            {props.data.travis_url && <a href={props.data.travis_url}><Validator tag="travis" repo={props.data}/> Travis</a>}
+            {props.data.dockerhub_url && <a href={props.data.dockerhub_url}><Validator tag="dockerhub" repo={props.data}/> Dockerhub</a>}
+            {props.data.readme_url && <a href={props.data.readme_url}><Validator tag="readme" repo={props.data}/> Readme</a>}
+            {props.data.issues_url && <a href={props.data.issues_url}><Validator tag="issues" repo={props.data}/> Issues</a>}
+          </div>
         </div>
-        <div className="card-action">
-          {props.data.html_url && <a href={props.data.html_url}><Validator tag="github" repo={props.data}/> Github</a>}
-          {props.data.travis_url && <a href={props.data.travis_url}><Validator tag="travis" repo={props.data}/> Travis</a>}
-          {props.data.dockerhub_url && <a href={props.data.dockerhub_url}><Validator tag="dockerhub" repo={props.data}/> Dockerhub</a>}
-          {props.data.readme_url && <a href={props.data.readme_url}><Validator tag="readme" repo={props.data}/> Readme</a>}
-          {props.data.issues_url && <a href={props.data.issues_url}><Validator tag="issues" repo={props.data}/> Issues</a>}
-        </div>
-      </div>
-    );
-  }
+      );
+    }
 
   class SortBy extends React.Component {
     constructor(props) {
       super(props);
       this.sortByChanged = ev => {
-        //console.log("f", ev)
         this.props.onSortByChanged(ev.target.value)
       }
     }
@@ -305,7 +310,6 @@
           repos: this.repos
         });
       }.bind(this));
-      //console.log(this.state.repos)
     }
 
     componentWillUnmount() {
@@ -327,7 +331,6 @@
         var bValue = ""
         var cValue = ""
         if (this.state.sortBy === "lastUpdate") {
-          // Add additional func for sorting Not valid on bottom.
           if (a[this.state.sortBy] === "Not valid") {
             return 1;
           }
@@ -343,11 +346,9 @@
         else {
           aValue = a[this.state.sortBy]
           bValue = b[this.state.sortBy]
-          //console.log("Sorting other stuff")
           return bValue - aValue
         }
       })
-      //console.log("asdfa", this.state.sortBy)
 
       return (
         <div>
