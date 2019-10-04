@@ -321,7 +321,7 @@
       const repoList = Object.values(this.state.repos)
       const filteredRepoList = repoList.filter(repo => {
         if (repo.name) {
-          return repo.name.startsWith(this.state.search);
+          return repo.name.includes(this.state.search);
         } else {
           return false
         }
@@ -380,6 +380,7 @@
 }
 
 .btn-filter {
+  height: 45px;
   width: 28%; /* Full-width */
   background-color: #009FDF;
   box-shadow: none;
