@@ -210,7 +210,8 @@
               <summary>Available tags</summary>
               <ul id="myUL">
                 {props.data.tags.map(t => (
-                  <li key={t.name}><b>{t.name}</b>: ({Math.round(t.size / 1e6)} Mb) - built { moment(t.last_updated).fromNow()}</li>
+                  <li key={t.name}><b>{t.name}</b>: ({Math.round(t.size / 1e6)} Mb) - built { moment(t.last_updated)
+                  .fromNow()}, {t.count && <span>used in {t.count} project(s)</span>}</li>
                 ))}
               </ul>
             </details>}
