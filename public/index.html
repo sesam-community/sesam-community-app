@@ -206,7 +206,7 @@
               </pre>
               <p>You might need to change the port and environment settings. {props.data.readme_url && 'Consult the README file for more information.'}</p>
             </details>
-            {props.data.tags && <details>
+            {props.data.tags && <details open>
               <summary>Available tags</summary>
               <ul id="myUL">
                 {props.data.tags.map(t => (
