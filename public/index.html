@@ -356,6 +356,7 @@
         <div>
           <SortBy onSortByChanged={this.handleSortByChanged} sortBy={this.state.sortBy}/>
           <Search onSearchChanged={this.handleSearchChanged} />
+          {repoList.length == 0 && <div >Fetching extensions, please wait..</div>}
           {sortedRepoList.map(repo => (
             <RepoCard key={repo.name} data={repo} />
           ))}
