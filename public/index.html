@@ -93,6 +93,12 @@
       tag: 'travis',
       error: true
     },
+    'has-sesamcommunity-cicd-githubaction': {
+      title: 'CI&CD',
+      description: 'Sesam Community CI&CD github action must be implemented as the preferred CI&CD plattform',
+      tag: 'cicd-githubaction',
+      error: true
+    },
     'has-docker-password-in-travis': {
       title: 'Docker password',
       description: 'Environment variable DOCKER_PASSWORD must be configured on the repository in Travis',
@@ -146,7 +152,7 @@
       repo.lastUpdate = "Not valid"
     }
     if (repo.pull_count == null) {
-      repo.pull_count = 0        
+      repo.pull_count = 0
     }
     if (repo.total_count == null) {
       repo.total_count = 0
@@ -194,7 +200,7 @@
         <div className="card">
           <div className="card-content white-text">
             <span className="card-title">{props.data.name}</span>
-            {props.data.badge_url && <img src={props.data.badge_url} alt="travis-badge" />}
+            {props.data.badge_url && <img src={props.data.badge_url} alt="build-badge" />}
             <p>{props.data.description}</p>
             <p>Last update : {props.data.lastUpdate}</p>
             <p>Dockerhub Pulls : {props.data.pull_count}</p>
@@ -215,7 +221,7 @@
                 ))}
               </ul>
             </details>}
-              {/*Making the return ready for manifest.json, in the below logic*/} 
+              {/*Making the return ready for manifest.json, in the below logic*/}
               {props.data.manifest && <details>
                 <summary>Manifest.json</summary>
                 <pre>
@@ -225,8 +231,9 @@
           </div>
           <div className="card-action">
             {props.data.html_url && <a href={props.data.html_url}><Validator tag="github" repo={props.data}/> Github</a>}
-            {props.data.travis_url && <a href={props.data.travis_url}><Validator tag="travis" repo={props.data}/> Travis</a>}
-            {props.data.dockerhub_url && <a href={props.data.dockerhub_url}><Validator tag="dockerhub" repo={props.data}/> Dockerhub</a>}
+            {!props.data.cicd_url && props.data.travis_url && <a href={props.data.travis_url}><Validator tag="travis" repo={props.data}/> CI&CD </a>}
+            {props.data.cicd_url && <a href={props.data.cicd_url}><Validator tag="cicd-githubaction" repo={props.data}/> CI&CD </a>}
+            {props.data.dockerhub_url && <a href={props.data.dockerhub_url}><Validator tag="dockerhub" repo={props.data}/> DockerRegistry</a>}
             {props.data.readme_url && <a href={props.data.readme_url}><Validator tag="readme" repo={props.data}/> Readme</a>}
             {props.data.issues_url && <a href={props.data.issues_url}><Validator tag="issues" repo={props.data}/> Issues</a>}
           </div>
@@ -245,8 +252,8 @@
     render() {
       return (
         <label>
-          Sort By... 
-          <br></br>    
+          Sort By...
+          <br></br>
         <select class="btn-large btn-filter" onChange={this.sortByChanged} value={this.props.sortBy}>
             <option value="">Alphabetically</option>
             <option value="total_count">Projects using this extension</option>
@@ -362,8 +369,8 @@
           ))}
         </div>
       );
-    }  
-  } 
+    }
+  }
 
   ReactDOM.render( <App />, document.getElementById('app'));
 </script>
