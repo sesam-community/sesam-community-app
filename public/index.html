@@ -232,8 +232,8 @@
           <div className="card-action">
             {props.data.html_url && <a href={props.data.html_url}><Validator tag="github" repo={props.data}/> Github</a>}
             {!props.data.cicd_url && props.data.travis_url && <a href={props.data.travis_url}><Validator tag="travis" repo={props.data}/> CI&CD </a>}
-            {props.data.cicd_url && <a href={props.data.cicd_url}><Validator tag="cicd-githubaction" repo={props.data}/> CI&CD </a>}
-            {props.data.dockerhub_url && <a href={props.data.dockerhub_url}><Validator tag="dockerhub" repo={props.data}/> DockerRegistry</a>}
+            {props.data.cicd_url && <a href={props.data.cicd_url}><Validator tag="cicd-githubaction" repo={props.data}/> Build</a>}
+            {props.data.dockerhub_url && <a href={props.data.dockerhub_url}><Validator tag="dockerhub" repo={props.data}/> Dockerhub</a>}
             {props.data.readme_url && <a href={props.data.readme_url}><Validator tag="readme" repo={props.data}/> Readme</a>}
             {props.data.issues_url && <a href={props.data.issues_url}><Validator tag="issues" repo={props.data}/> Issues</a>}
           </div>
